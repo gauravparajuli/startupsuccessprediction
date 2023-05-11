@@ -1,6 +1,8 @@
+from datetime import date
 from flask import Flask, request, jsonify, render_template
 import os
 import utils
+import datetime
 
 app = Flask(__name__, template_folder='client',
             static_folder='client', static_url_path='/static')
@@ -39,13 +41,20 @@ def get_countries():
 
 @app.route('/estimate', methods=['POST'])
 def estimate_house_price():
-    total_sqft = float(request.form['total_sqft'])
-    location = request.form['location']
-    bhk = int(request.form['bhk'])
-    bath = int(request.form['bath'])
+    nRounds = float(request.form['nRounds'])
+    investment = float(request.form['investment'])
+    founded = datetime.datetime.strptime(
+        request.form['founded'], '%m/%d/%Y')
+    first = datetime.datetime.strptime(
+        request.form['first'], '%m/%d/%Y')
+    last = datetime.datetime.strptime(request.form['last'], '%m/%d/%Y')
+    # market = utils.get_markets()[request.form['market']]
+    # country = utils.get_markets()[request.form['country']]
+    market = request.form['market']
+    country = request.form['country']
 
     response = jsonify({
-        'estimated_price': utils.get_estimated_price(location, total_sqft, bhk, bath)
+        'status': utils.predict_success(nRounds, investment, founded, first, last, market, country)
     })
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response

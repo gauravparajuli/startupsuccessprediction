@@ -1,54 +1,54 @@
-const loadLocations = () => {
-    const url = 'http://localhost:5000/get_location_names'
-    $.get(url, (data, status) => {
+const load = () => {
+    const marketUrl = 'http://localhost:8000/get_markets'
+    const countryUrl = 'http://localhost:8000/get_countries'
+    $.get(marketUrl, (data, status) => {
         if (data) {
-            const locations = data.locations
-            const uiLocation = document.getElementById('location')
-            for (loc in locations) {
-                const opt = new Option(locations[loc])
-                uiLocation.append(opt)
+            const markets = data.markets
+            const uiMarket = document.getElementById('market')
+            for (m in markets) {
+                const opt = new Option((text = m), (value = markets[m]))
+                uiMarket.append(opt)
+            }
+        }
+    })
+    $.get(countryUrl, (data, status) => {
+        if (data) {
+            const countries = data.countries
+            const uiCountry = document.getElementById('country')
+            for (c in countries) {
+                const opt = new Option((text = c), (value = countries[c]))
+                uiCountry.append(opt)
             }
         }
     })
 }
 
-const getBhkValue = () => {
-    var uiBhks = document.getElementsByName('bhk')
-    for (i in uiBhks) {
-        if (uiBhks[i].checked) {
-            return parseInt(i) + 1
-        }
-    }
-}
+const estimate = () => {
+    const url = 'http://localhost:8000/estimate'
+    const nRounds = document.getElementById('nRounds').value
+    const founded = document.getElementById('founded').value
+    const first = document.getElementById('first').value
+    const last = document.getElementById('last').value
+    const market = document.getElementById('market').value
+    const country = document.getElementById('country').value
+    const investment = document.getElementById('investment').value
 
-const getBathValue = () => {
-    var uiBaths = document.getElementsByName('bath')
-    for (i in uiBaths) {
-        if (uiBaths[i].checked) {
-            return parseInt(i) + 1
-        }
-    }
-}
-
-const onPredictSucccessClick = () => {
-    const url = 'http://localhost:5000/estimate'
-    const sqft = document.getElementById('area')
-    const bhk = getBhkValue()
-    const bath = getBathValue()
-    const location = document.getElementById('location')
     $.post(
         url,
         {
-            total_sqft: parseFloat(sqft.value),
-            bhk,
-            bath,
-            location: location.value,
+            nRounds: parseFloat(nRounds),
+            founded,
+            first,
+            last,
+            market,
+            country,
+            investment,
         },
         (data, status) => {
             // console.log(data)
-            alert(`Estimated Price is: ${data.estimated_price} lakh(s)`)
+            alert(`Given startup will be ${data.status}!`)
         }
     )
 }
 
-window.onload = loadLocations()
+window.onload = load()
